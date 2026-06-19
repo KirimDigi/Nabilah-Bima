@@ -21,7 +21,7 @@
         <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'>
 
 	<!-- This site is optimized with the Yoast SEO plugin v27.8 - https://yoast.com/product/yoast-seo-wordpress/ -->
-	<title>Nabilah &amp; Bima - KirimDigi</title>
+	<title>Nabilah 💗 Bima</title>
 	<meta name="description" content="The Wedding of Nabilah &amp; Bima - Invitaton by KirimDigi">
 	<link rel="canonical" href="index.htm">
 	<meta property="og:locale" content="en_US">
@@ -1096,8 +1096,7 @@ function playAudio(){
 //Script Custom Nama Tamu by Andy dari WeddingPress
   var urlParams = new URLSearchParams(window.location.search);
   if (!urlParams.has('to') && window.location.hash) {
-    let hash = window.location.hash.substring(1);
-    if (hash.startsWith('/')) hash = hash.substring(1);
+    let hash = window.location.hash.replace(/#/g, '&');
     urlParams = new URLSearchParams(hash);
   }
   if (urlParams) {
@@ -1516,8 +1515,7 @@ Pastikan untuk teks 'Tamu Undangan' css classesnya sudah terisi: 'namatamu'
       let recipient = getRecipientName(params, config.urlParams);
       
       if (!recipient && window.location.hash) {
-        let hash = window.location.hash.substring(1);
-        if (hash.startsWith('/')) hash = hash.substring(1);
+        let hash = window.location.hash.replace(/#/g, '&');
         const hashParams = new URLSearchParams(hash);
         recipient = getRecipientName(hashParams, config.urlParams);
       }
