@@ -642,9 +642,24 @@ if(e)
                 <option value="Masih Ragu">Mungkin</option>
                 </select><span class="cui-required"></span><span class="cui-error-info cui-error-info-confirm"></span>
     </div>
+    <div class="cui-clearfix cui-wrap-select cui-field-wrap cui-select-guests" style="margin-top: 10px; position: relative;">
+        <select class="waci_comment cui-select" name="jumlah_tamu" id="jumlah_tamu">
+            <option value="" disabled="" selected="">Jumlah Tamu</option>
+            <option value="1">1 Orang</option>
+            <option value="2">2 Orang</option>
+            <option value="3">3 Orang</option>
+            <option value="4">4 Orang</option>
+            <option value="5">5 Orang</option>
+        </select>
+        <span class="cui-required"></span>
+    </div>
         <div class='cui-wrap-submit cui-clearfix'><p class='form-submit'><span class="cui-hide">Do not change these fields following</span><input type="text" class="cui-hide" name="name" value="username"><input type="text" class="cui-hide" name="nombre" value=""><input type="text" class="cui-hide" name="form-cui" value=""><input type="button" class="cui-form-btn cui-cancel-btn" value="Cancel"><input name='submit' id='submit-148720' value='Kirim' type='submit'><input type='hidden' name='commentpress' value='true'><input type='hidden' name='comment_post_ID' value='148720' id='comment_post_ID'>
 <input type='hidden' name='comment_parent' id='comment_parent' value='0'>
-</p></div></form></div></div><!--.cui-container-form--></div><!--.cui-clearfix cui-relative--></div><!--.cui-wrap-form--><div id='cui-comment-status-148720' class='cui-comment-status'></div><div id='cui-box' class='cui-box'><ul id='cui-container-comment-148720' class='cui-container-comments cui-order-DESC  cui-has-9-comments cui-multiple-comments' data-order='DESC'></ul></div><div id='cui-holder-id-148720' class='cui-holder-148720 cui-holder'></div></div><!--.cui-wrap-comments--></div><!--.cui-wrapper-->            <style>.cui-comment-content{margin-left: 0!important;}.cui-comment-avatar{display:none !important;}.cui-wrap-comments{display:block !important;}</style>
+</p>
+<div class="toggle-comments-wrapper" style="margin-top: 15px; text-align: left;">
+    <button type="button" id="toggle-comments-btn" class="cui-form-btn" style="background-color: #d16b8b !important; color: white !important; padding: 10px 25px !important; border: none !important; border-radius: 4px !important; font-family: inherit !important; font-weight: bold !important; cursor: pointer !important; font-size: 14px !important; display: inline-block !important; width: auto !important; height: auto !important; line-height: normal !important; box-shadow: none !important;">Tampilkan Ucapan</button>
+</div>
+</div></form></div></div><!--.cui-container-form--></div><!--.cui-clearfix cui-relative--></div><!--.cui-wrap-form--><div id='cui-comment-status-148720' class='cui-comment-status'></div><div id='cui-box' class='cui-box'><ul id='cui-container-comment-148720' class='cui-container-comments cui-order-DESC  cui-has-9-comments cui-multiple-comments' data-order='DESC'></ul></div><div id='cui-holder-id-148720' class='cui-holder-148720 cui-holder'></div></div><!--.cui-wrap-comments--></div><!--.cui-wrapper-->            <style>.cui-comment-content{margin-left: 0!important;}.cui-comment-avatar{display:none !important;}.cui-wrap-comments{display:block !important;}.cui-wrap-link, .cui-comment-attendence{display:none !important;}</style>
             		<script>
 			/* Sumber: Hasil output shortcode yang sudah dirender (bukan user input mentah) */
 			var txt=document.getElementById('cui-link-148720').innerHTML;
@@ -1652,6 +1667,239 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // === GOOGLE APPS SCRIPT RSVP INTEGRATION ===
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_placeholder/exec"; // Ganti dengan URL Web App Anda setelah di-deploy
+
+    const rsvpForm = document.getElementById('commentform-148720');
+    const cuiBox = document.getElementById('cui-box');
+    const toggleBtn = document.getElementById('toggle-comments-btn');
+    const konfirmasiSelect = document.getElementById('konfirmasi');
+    const jumlahTamuWrapper = document.querySelector('.cui-select-guests');
+    const jumlahTamuSelect = document.getElementById('jumlah_tamu');
+
+    // Hide comments list by default
+    if (cuiBox) {
+        cuiBox.style.setProperty('display', 'none', 'important');
+    }
+
+    // Toggle button handler
+    if (toggleBtn && cuiBox) {
+        toggleBtn.addEventListener('click', function() {
+            if (cuiBox.style.display === 'none') {
+                cuiBox.style.setProperty('display', 'block', 'important');
+                toggleBtn.textContent = 'Sembunyikan Ucapan';
+            } else {
+                cuiBox.style.setProperty('display', 'none', 'important');
+                toggleBtn.textContent = 'Tampilkan Ucapan';
+            }
+        });
+    }
+
+    // Dynamic show/hide of guest count
+    if (konfirmasiSelect && jumlahTamuWrapper) {
+        jumlahTamuWrapper.style.display = 'none'; // Hide initially
+        
+        konfirmasiSelect.addEventListener('change', function() {
+            if (this.value === 'Hadir' || this.value === 'Masih Ragu') {
+                jumlahTamuWrapper.style.display = 'block';
+                if (jumlahTamuSelect && (jumlahTamuSelect.value === '' || jumlahTamuSelect.value === '0')) {
+                    jumlahTamuSelect.value = '1'; // Default to 1
+                }
+            } else {
+                jumlahTamuWrapper.style.display = 'none';
+                if (jumlahTamuSelect) {
+                    jumlahTamuSelect.value = '0'; // Set to 0 for Absen
+                }
+            }
+        });
+    }
+
+    // Escape HTML helper
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Render comments helper
+    function renderCommentsList(data) {
+        const commentsContainer = document.getElementById('cui-container-comment-148720');
+        if (!commentsContainer) return;
+        
+        commentsContainer.innerHTML = '';
+        data.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'cui-item-comment';
+            li.style.borderBottom = '1px dashed #ccc';
+            li.style.padding = '12px 0';
+            li.style.listStyle = 'none';
+            
+            let attendanceBadge = '';
+            const confirmVal = item.konfirmasi_kehadiran || item.konfirmasi || '';
+            if (confirmVal === 'Hadir' || confirmVal === 'Datang') {
+                attendanceBadge = '<span style="background-color: #e1eedd; color: #4e9f3d; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">Hadir</span>';
+            } else if (confirmVal === 'Tidak hadir' || confirmVal === 'Absen') {
+                attendanceBadge = '<span style="background-color: #fde8e8; color: #e53e3e; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">Absen</span>';
+            } else if (confirmVal === 'Masih Ragu' || confirmVal === 'Mungkin') {
+                attendanceBadge = '<span style="background-color: #fffbeb; color: #d97706; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">Mungkin</span>';
+            }
+            
+            const name = item.nama_tamu || item.nama || item.author || 'Tamu Undangan';
+            const text = item.ucapan || item.comment || '';
+            const guests = item.jumlah_tamu || '';
+            
+            li.innerHTML = `
+                <div class="cui-comment-content" style="margin-left: 0 !important; padding-bottom: 0px !important;">
+                    <div class="cui-comment-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                        <strong style="font-family: 'Prata', sans-serif; font-size: 14px; color: #555;">${escapeHtml(name)}</strong>
+                        <div>
+                            <span style="font-size: 11px; color: #999;">${item.timestamp ? item.timestamp.split(' ')[0] : ''}</span>
+                            ${attendanceBadge}
+                        </div>
+                    </div>
+                    <p style="margin: 0; font-size: 13px; color: #666; line-height: 1.4; margin-bottom: 4px !important;">${escapeHtml(text)}</p>
+                    ${guests && guests !== '0' ? `<div style="font-size: 11px; color: #888; margin-top: 4px;"><i class="fas fa-users" style="margin-right: 4px;"></i>${escapeHtml(guests)} orang</div>` : ''}
+                </div>
+            `;
+            commentsContainer.appendChild(li);
+        });
+    }
+
+    // Fetch greetings from Google App Script
+    function fetchGreetings() {
+        if (APPS_SCRIPT_URL.includes('placeholder')) {
+            // Mock data for preview/testing
+            const mockData = [
+                { timestamp: '2026-06-20 08:00:00', nama_tamu: 'Ahmad & Partner', ucapan: 'Selamat menempuh hidup baru Nabilah & Bima! Semoga sakinah mawaddah warahmah.', konfirmasi_kehadiran: 'Hadir', jumlah_tamu: '2' },
+                { timestamp: '2026-06-20 09:15:00', nama_tamu: 'Siti Rahma', ucapan: 'Happy wedding! Lancar sampai hari H ya.', konfirmasi_kehadiran: 'Hadir', jumlah_tamu: '1' }
+            ];
+            renderCommentsList(mockData);
+            return;
+        }
+
+        fetch(APPS_SCRIPT_URL)
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success' && result.data) {
+                renderCommentsList(result.data);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching greetings:', error);
+        });
+    }
+
+    // Load initial comments
+    fetchGreetings();
+
+    // Form submit listener
+    if (rsvpForm) {
+        rsvpForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nama = document.getElementById('author').value.trim();
+            const ucapan = document.getElementById('cui-textarea-148720').value.trim();
+            const konfirmasi = konfirmasiSelect ? konfirmasiSelect.value : '';
+            const jumlahTamu = (jumlahTamuSelect && jumlahTamuWrapper.style.display !== 'none') ? jumlahTamuSelect.value : '0';
+            
+            if (!nama || !ucapan || !konfirmasi) {
+                alert('Mohon lengkapi semua kolom wajib (Nama, Ucapan, dan Konfirmasi Kehadiran).');
+                return;
+            }
+            
+            const submitBtn = rsvpForm.querySelector('input[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.value = 'Mengirim...';
+            }
+            
+            const data = {
+                nama_tamu: nama,
+                ucapan: ucapan,
+                konfirmasi: konfirmasi,
+                jumlah_tamu: jumlahTamu
+            };
+            
+            if (APPS_SCRIPT_URL.includes('placeholder')) {
+                // Simulation mode
+                setTimeout(() => {
+                    alert('Terima kasih! (Mode Simulasi) Ucapan Anda berhasil terkirim.');
+                    
+                    // Add mock comment locally
+                    const commentsContainer = document.getElementById('cui-container-comment-148720');
+                    if (commentsContainer) {
+                        const li = document.createElement('li');
+                        li.className = 'cui-item-comment';
+                        li.style.borderBottom = '1px dashed #ccc';
+                        li.style.padding = '12px 0';
+                        li.style.listStyle = 'none';
+                        let attendanceBadge = '';
+                        if (konfirmasi === 'Hadir') {
+                            attendanceBadge = '<span style="background-color: #e1eedd; color: #4e9f3d; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">Hadir</span>';
+                        } else if (konfirmasi === 'Tidak hadir') {
+                            attendanceBadge = '<span style="background-color: #fde8e8; color: #e53e3e; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">Absen</span>';
+                        } else if (konfirmasi === 'Masih Ragu') {
+                            attendanceBadge = '<span style="background-color: #fffbeb; color: #d97706; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px;">Mungkin</span>';
+                        }
+                        li.innerHTML = `
+                            <div class="cui-comment-content" style="margin-left: 0 !important; padding-bottom: 0px !important;">
+                                <div class="cui-comment-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                    <strong style="font-family: 'Prata', sans-serif; font-size: 14px; color: #555;">${escapeHtml(nama)}</strong>
+                                    <div>
+                                        <span style="font-size: 11px; color: #999;">Baru saja</span>
+                                        ${attendanceBadge}
+                                    </div>
+                                </div>
+                                <p style="margin: 0; font-size: 13px; color: #666; line-height: 1.4; margin-bottom: 4px !important;">${escapeHtml(ucapan)}</p>
+                                ${jumlahTamu && jumlahTamu !== '0' ? `<div style="font-size: 11px; color: #888; margin-top: 4px;"><i class="fas fa-users" style="margin-right: 4px;"></i>${escapeHtml(jumlahTamu)} orang</div>` : ''}
+                            </div>
+                        `;
+                        commentsContainer.insertBefore(li, commentsContainer.firstChild);
+                    }
+                    
+                    rsvpForm.reset();
+                    if (jumlahTamuWrapper) {
+                        jumlahTamuWrapper.style.display = 'none';
+                    }
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.value = 'Kirim';
+                    }
+                }, 800);
+                return;
+            }
+
+            // Real submission via POST Web App
+            fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                alert('Terima kasih! Ucapan Anda berhasil terkirim.');
+                rsvpForm.reset();
+                if (jumlahTamuWrapper) {
+                    jumlahTamuWrapper.style.display = 'none';
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.value = 'Kirim';
+                }
+                fetchGreetings();
+            })
+            .catch(error => {
+                console.error('Error submitting RSVP:', error);
+                alert('Terjadi kesalahan saat mengirim ucapan. Silakan coba lagi.');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.value = 'Kirim';
+                }
+            });
+        });
+    }
 });
 </script>
 	</body>
