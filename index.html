@@ -1095,27 +1095,27 @@ function playAudio(){
 					<script>
 //Script Custom Nama Tamu by Andy dari WeddingPress
   var urlParams = new URLSearchParams(window.location.search);
+  if (!urlParams.has('to') && window.location.hash) {
+    let hash = window.location.hash.substring(1);
+    if (hash.startsWith('/')) hash = hash.substring(1);
+    urlParams = new URLSearchParams(hash);
+  }
   if (urlParams) {
-    var textElement = document.getElementById('namatamu');
-    var defaultText = textElement.innerHTML;
-    var newText = defaultText;
+    var textElement = document.getElementById('namatamu') || document.querySelector('.namatamu');
+    if (textElement) {
+      var defaultText = textElement.innerHTML;
+      var newText = defaultText;
 
-    if (urlParams.has('to')) {
-      var toValue = urlParams.get('to');
-      newText = newText.replace(/Tamu Undangan/g, toValue);
+      var recipient = '';
+      if (urlParams.has('to')) recipient = urlParams.get('to');
+      else if (urlParams.has('dear')) recipient = urlParams.get('dear');
+      else if (urlParams.has('kepada')) recipient = urlParams.get('kepada');
+
+      if (recipient) {
+        newText = newText.replace(/Nama Tamu/g, recipient).replace(/Tamu Undangan/g, recipient);
+        textElement.innerHTML = newText;
+      }
     }
-
-    if (urlParams.has('dear')) {
-      var dearValue = urlParams.get('dear');
-      newText = newText.replace(/Tamu Undangan/g, dearValue);
-    }
-
-    if (urlParams.has('kepada')) {
-      var kepadaValue = urlParams.get('kepada');
-      newText = newText.replace(/Tamu Undangan/g, kepadaValue);
-    }
-
-    textElement.innerHTML = newText;
   }
 </script>				</div>
 				</div>
@@ -1512,15 +1512,23 @@ Pastikan untuk teks 'Tamu Undangan' css classesnya sudah terisi: 'namatamu'
     }
   
     function wdpDisplayGuestName() {
-      const params = new URLSearchParams(window.location.search);
-      const recipient = getRecipientName(params, config.urlParams);
-      const targets = document.querySelectorAll(config.selector);
+      let params = new URLSearchParams(window.location.search);
+      let recipient = getRecipientName(params, config.urlParams);
+      
+      if (!recipient && window.location.hash) {
+        let hash = window.location.hash.substring(1);
+        if (hash.startsWith('/')) hash = hash.substring(1);
+        const hashParams = new URLSearchParams(hash);
+        recipient = getRecipientName(hashParams, config.urlParams);
+      }
   
+      const targets = document.querySelectorAll(config.selector);
       if (targets.length === 0) return;
   
       targets.forEach(element => {
         if (recipient) {
-          replaceTextInNode(element, config.defaultText, recipient);
+          replaceTextInNode(element, 'Nama Tamu', recipient);
+          replaceTextInNode(element, 'Tamu Undangan', recipient);
         } else {
           if (!element.textContent.trim()) {
             element.textContent = config.defaultText;
