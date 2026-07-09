@@ -141,3 +141,34 @@
 .elementor-148720 .elementor-element.elementor-element-f365a3c img {
     transform: scale(1.08) !important;
 }
+
+
+/* Center the video widget and its inner elements perfectly */
+.elementor-148720 .elementor-element.elementor-element-9f9d420 {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+.elementor-148720 .elementor-element.elementor-element-128700d {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+.elementor-148720 .elementor-element.elementor-element-128700d .elementor-widget-container {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+.elementor-148720 .elementor-element.elementor-element-128700d .elementor-wrapper {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+.elementor-148720 .elementor-element.elementor-element-128700d video.elementor-video {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: block !important;
+}
