@@ -89,9 +89,13 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		  font-size: 14px
 		}
 	
+        .cui-box {
+            max-height: none !important;
+            overflow: visible !important;
+        }
         .cui-wrapper ul.cui-container-comments {
-            max-height: 300px;
-            overflow-y:scroll;
+            max-height: 650px !important;
+            overflow-y: scroll !important;
         }
         .cui-post-author {
 	color: white !important;
@@ -1661,8 +1665,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Escape HTML helper
     function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        if (str === null || str === undefined) return '';
+        const s = String(str);
+        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
     // Render comments helper
